@@ -271,7 +271,7 @@
       </select>
     </div>
     <div>
-      <div class="label-row"><label>Peralte manual (m)</label><button type="button" class="info-btn" data-help="peralte" aria-label="Ayuda sobre Peralte">ⓘ</button></div>
+      <div class="label-row"><label>Peralte total exterior (m)</label><button type="button" class="info-btn" data-help="peralte" aria-label="Ayuda sobre Peralte">ⓘ</button></div>
       <input id="peralteManual" type="number" min="0.2" max="4" step="0.05" value="1.00">
     </div>
     <div>
@@ -395,7 +395,7 @@ const ayudasProyecto={
   },
   peralte:{
     titulo:"Peralte manual",
-    texto:"Es la altura total de la cabrilla. Un peralte mayor normalmente mejora la rigidez y reduce la deformación.",
+    texto:"Es la altura total exterior de la cabrilla, medida desde la cara exterior del cordón inferior hasta la cara exterior del cordón superior. El programa descuenta automáticamente el tamaño de los cordones para calcular la distancia entre sus ejes.",
     ejemplo:"      ▲\n      │ 0.80 m\n──────┴──────"
   },
   calibre:{
@@ -517,11 +517,13 @@ function solveGauss(A,b){
   return x;
 }
 
-function crearGeo(L,h,np,areas){
+function crearGeo(L,hEjes,np,areas,hTotal=hEjes){
+  // hTotal: peralte exterior de fabricación.
+  // hEjes: distancia entre los ejes de los cordones usada en el análisis.
   const a=L/np,nodos=[],barras=[];
   for(let i=0;i<=np;i++){
     nodos.push({x:i*a,y:0,id:`BI-${i+1}`});
-    nodos.push({x:i*a,y:h,id:`BS-${i+1}`});
+    nodos.push({x:i*a,y:hEjes,id:`BS-${i+1}`});
   }
   const bi=i=>2*i,bs=i=>2*i+1;
   for(let i=0;i<np;i++){
@@ -533,7 +535,7 @@ function crearGeo(L,h,np,areas){
     if(i<np/2) barras.push({i:bs(i),j:bi(i+1),g:"Diagonales",A:areas["Diagonales"]});
     else barras.push({i:bi(i),j:bs(i+1),g:"Diagonales",A:areas["Diagonales"]});
   }
-  return {L,h,np,a,nodos,barras};
+  return {L,h:hEjes,hEjes,hTotal,np,a,nodos,barras};
 }
 
 function analizar(geo,profiles,carga,separacion,presionViento=0){
@@ -644,7 +646,12 @@ function evaluar(L,h,np,carga,separacion,lista,presionViento,nivelOpcion=0){
 
       const areas={};
       Object.keys(sel).forEach(g=>areas[g]=sel[g].area);
-      const geo=crearGeo(L,h,np,areas);
+
+      // El dato h es el peralte exterior total. Como ambos cordones tienen
+      // el mismo tamaño, la distancia entre ejes es h menos una altura B.
+      const hEjes=h-perfilCordon.B/1000;
+      if(hEjes<=0.05) continue;
+      const geo=crearGeo(L,hEjes,np,areas,h);
       let res;
       try{
         res=analizar(geo,sel,carga,separacion,presionViento);
@@ -737,7 +744,7 @@ let opcionSeleccionada=0;
 let contextoUltimoCalculo=null;
 
 function firmaMateriales(s){
-  return Object.keys(s.sel).map(g=>`${g}:${s.sel[g].id}`).join("|")+`|h:${s.geo.h.toFixed(2)}`;
+  return Object.keys(s.sel).map(g=>`${g}:${s.sel[g].id}`).join("|")+`|h:${s.geo.hTotal.toFixed(2)}`;
 }
 
 function svgCabrilla(g){
@@ -775,7 +782,8 @@ function renderizarOpciones(){
         <div class="option-stat"><span>Peso total</span><strong>${fmt(s.res.peso,1)} kg</strong></div>
         <div class="option-stat"><span>Utilización</span><strong>${fmt(s.maxu*100,1)} %</strong></div>
         <div class="option-stat"><span>Deflexión</span><strong>${fmt(s.res.maxDef*1000,2)} mm</strong></div>
-        <div class="option-stat"><span>Peralte</span><strong>${fmt(s.geo.h,2)} m</strong></div>
+        <div class="option-stat"><span>Peralte total</span><strong>${fmt(s.geo.hTotal,2)} m</strong></div>
+        <div class="option-stat"><span>Entre ejes</span><strong>${fmt(s.geo.hEjes,3)} m</strong></div>
         <div class="option-stat"><span>Índice de eficiencia</span><strong>${fmt((1/(s.res.peso*Math.max(s.maxu,0.05)))*1000,2)}</strong></div>
       </div>
       <div class="option-materials"><div><strong>Criterio:</strong> combinación eficiente por elemento</div><div><strong>Regla:</strong> máximo 2 materiales; montantes y diagonales ≤ cordones</div>${mats}</div>
@@ -882,12 +890,12 @@ function calcular(){
       // En automático se muestran tres peraltes diferentes.
       const porPeralte=new Map();
       unicas.forEach(s=>{
-        const clave=s.geo.h.toFixed(2);
+        const clave=s.geo.hTotal.toFixed(2);
         const actual=porPeralte.get(clave);
         if(!actual || s.res.peso<actual.res.peso) porPeralte.set(clave,s);
       });
 
-      const grupos=[...porPeralte.values()].sort((a,b)=>a.geo.h-b.geo.h);
+      const grupos=[...porPeralte.values()].sort((a,b)=>a.geo.hTotal-b.geo.hTotal);
 
       if(grupos.length>=3){
         const baja=grupos[0];
@@ -952,7 +960,7 @@ function mostrar(s,total,cargaMax,presionViento){
     <tr><td>Referencia técnica</td><td>IMCA 6a Ed. (2022) y referencia de viento CFE 2020. Evaluación preliminar; requiere memoria de cálculo profesional.</td></tr>
   `;
 
-  document.getElementById("mensaje").innerHTML=`<strong>Resultado preliminar:</strong> La alternativa cumple las verificaciones implementadas de esfuerzo axial, pandeo global y deflexión. Aún deben revisarse pandeo local, soldaduras, conexiones, apoyos, estabilidad fuera del plano y el procedimiento completo de viento antes de fabricar.`;
+  document.getElementById("mensaje").innerHTML=`<strong>Resultado preliminar:</strong> El peralte indicado se considera exterior total y la geometría se analiza con la distancia real entre ejes de los cordones. La alternativa cumple las verificaciones implementadas de esfuerzo axial, pandeo global y deflexión. Aún deben revisarse pandeo local, soldaduras, conexiones, apoyos, estabilidad fuera del plano y el procedimiento completo de viento antes de fabricar.`;
   dibujar(s.geo);
 }
 
@@ -993,7 +1001,7 @@ function dibujar(g){
   const modo=document.getElementById("modoPeralte").value;
   const peralteManual=num("peralteManual");
   const calibre=document.getElementById("calibre").value;
-  const peralteMostrado=modo==="manual"?peralteManual:g.h;
+  const peralteMostrado=modo==="manual"?peralteManual:(g.hTotal||g.h);
 
   const izq=75,der=45,sup=125,inf=90;
   const ancho=c.width-izq-der;
@@ -1013,7 +1021,7 @@ function dibujar(g){
   ctx.fillStyle="#475569";
   ctx.fillText(`Ubicación: ${estado}, ${municipio}`,20,52);
   ctx.fillText(`Luz: ${luz} m   |   Separación: ${separacion} m   |   Paneles: ${paneles}`,20,73);
-  ctx.fillText(`Carga de diseño: ${carga} kg/m²   |   Peralte: ${peralteMostrado.toFixed(2)} m   |   Calibre mínimo: Cal. ${calibre}`,20,94);
+  ctx.fillText(`Carga de diseño: ${carga} kg/m²   |   Peralte total: ${peralteMostrado.toFixed(2)} m   |   Calibre mínimo: Cal. ${calibre}`,20,94);
 
   ctx.strokeStyle="#e2e8f0";
   ctx.lineWidth=1;
@@ -1135,7 +1143,8 @@ function actualizarVistaCliente(){
   };
 
   try{
-    const geo=crearGeo(L,h,np,areas);
+    const hEjes=Math.max(h-0.0508,0.05); // Vista previa con cordón PTR de 2 pulgadas.
+    const geo=crearGeo(L,hEjes,np,areas,h);
     dibujar(geo);
   }catch(e){}
 }
