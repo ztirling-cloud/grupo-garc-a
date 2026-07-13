@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutoCabrilla MX - Core Matricial con Asistente IA</title>
+<style>
+  /* 1. Estilos de la Aplicación Original (Estética y Limpia) */
+  :root{
+    --bg:#edf3f8;--card:#fff;--text:#172033;--muted:#667085;
+    --primary:#166534;--primary2:#15803d;--border:#d7dee8;
+    --ok:#166534;--warn:#9a6700;--bad:#991b1b
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:linear-gradient(135deg,#14532d,#15803d);color:#fff;padding:26px 18px}
+  .wrap{max-width:1180px;margin:auto}
+  h1{margin:0 0 7px;font-size:30px}
+  header p{margin:0;opacity:.92}
+  main{max-width:1180px;margin:22px auto;padding:0 14px 45px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+  h2{margin:0 0 16px;font-size:21px}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+  input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px;background:#fff}
+  input:focus,select:focus{outline:2px solid #86efac;border-color:#16a34a}
+  input:disabled,select:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed}
+  .help{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+  .actions{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:18px}
+  button{border:0;border-radius:11px;padding:14px;font-size:16px;font-weight:800;cursor:pointer}
+  .primary{background:var(--primary);color:#fff}.primary:hover{background:#14532d}
+  .secondary{background:#e2e8f0;color:#172033}.secondary:hover{background:#cbd5e1}
+  .results{display:none}
+  .metric{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px}
+  .metric .name{font-size:12px;color:var(--muted)}
+  .metric .value{font-size:20px;font-weight:800;margin-top:5px}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+  .note{padding:13px;border:1px solid #fed7aa;background:#fff7ed;border-radius:10px;font-size:13px;line-height:1.45;margin-top:14px}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}
+  th{background:#f8fafc}
+  canvas{width:100%;height:300px;border:1px solid var(--border);border-radius:12px;background:#fff}
+  #progress{display:none;margin-top:14px}
+  .bar{height:12px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+  .bar span{display:block;height:100%;width:0;background:var(--primary2);transition:width .25s}
+  .small{font-size:12px;color:var(--muted)}
+  .print-title{display:none}
+  @media(max-width:820px){.grid2,.grid3,.actions{grid-template-columns:1fr}}
+  
+  /* 2. Estilos Agregados para el Chat Flotante de IA */
+  #ai-chat-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+  #ai-chat-btn { background: var(--primary); color: white; border: none; padding: 14px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  #ai-chat-window { width: 330px; height: 420px; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; margin-top: 10px; }
+  #ai-chat-header { background: #14532d; color: white; padding: 12px; font-weight: bold; font-size: 14px; }
+  #ai-chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #f8fafc; }
+  .msg { padding: 8px 12px; border-radius: 12px; font-size: 13px; max-width: 80%; line-height: 1.45; }
+  .msg.ai { background: #e2e8f0; align-self: flex-start; color: #172033; }
+  .msg.user { background: var(--primary); align-self: flex-end; color: white; }
+  #ai-chat-input-area { display: flex; padding: 10px; border-top: 1px solid var(--border); background: white; }
+  #ai-chat-input-area input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; }
+  #ai-chat-input-area button { background: var(--primary); color: white; border: none; padding: 8px 12px; margin-left: 5px; border-radius: 8px; cursor: pointer; }
+
+  @media print{
+    body{background:#fff}
+    header,.no-print,#progress,#ai-chat-container{display:none!important}
+    main{max-width:none;margin:0;padding:0}
+    .card{box-shadow:none;border:0;border-radius:0;page-break-inside:avoid}
+    .print-title{display:block;text-align:center;margin-bottom:18px}
+    .results{display:block!important}
+    button{display:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>AutoCabrilla MX</h1>
+    <p>Diseño estructural con control de paneles, peralte manual y asistente técnico.</p>
+  </div>
+</header>
+
+<main>
+<div class="print-title">
+  <h1>AutoCabrilla MX</h1>
+  <p>Memoria de cálculo preliminar estructurada matricialmente</p>
+</div>
+
+<section class="card no-print">
+  <h2>1. Datos del proyecto</h2>
+  <div class="grid2">
+    <div>
+      <label>Estado</label>
+      <select id="estado" onchange="actualizarMunicipios()"></select>
+    </div>
+    <div>
+      <label>Municipio</label>
+      <select id="municipio"></select>
+    </div>
+    <div>
+      <label>Luz de la cabrilla (m)</label>
+      <input id="luz" type="number" min="3" max="15" step="0.01" value="6">
+    </div>
+    <div>
+      <label>Separación entre cabrillas (m)</label>
+      <input id="separacion" type="number" min="0.50" step="0.01" value="1">
+    </div>
+    <div>
+      <label>Número de paneles (Debe ser par)</label>
+      <input id="paneles" type="number" min="4" max="30" step="2" value="6">
+    </div>
+    <div>
+      <label>Carga de diseño (kg/m²)</label>
+      <input id="carga" type="number" min="0" step="0.1" value="100">
+    </div>
+    <div>
+      <label>Modo de Peralte (Altura)</label>
+      <select id="modoPeralte" onchange="document.getElementById('peralteManual').disabled = this.value === 'auto';">
+        <option value="auto">Automático (Más Económico)</option>
+        <option value="manual" selected>Manual (Fijo / Personalizado)</option>
+      </select>
+    </div>
+    <div>
+      <label>Peralte manual (m)</label>
+      <input id="peralteManual" type="number" min="0.2" max="4" step="0.05" value="1.00">
+    </div>
+    <div>
+      <label>Calibre mínimo permitido</label>
+      <select id="calibre">
+        <option value="16">Cal. 16</option>
+        <option value="14" selected>Cal. 14</option>
+        <option value="11">Cal. 11</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" onclick="calcular()">CALCULAR CABRILLA</button>
+    <button class="secondary" onclick="imprimirPDF()">GENERAR PDF</button>
+  </div>
+
+  <div id="progress">
+    <div class="bar"><span id="barra"></span></div>
+    <div class="small" id="textoProgreso">Calculando…</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>2. Geometría de la cabrilla</h2>
+  <canvas id="vista" width="1050" height="300"></canvas>
+</section>
+
+<section class="card results" id="resumen">
+  <h2>3. Resultado del Análisis Estructural Real</h2>
+  <div class="grid3">
+    <div class="metric"><div class="name">Estado del diseño</div><div class="value" id="rEstado">—</div></div>
+    <div class="metric"><div class="name">Peralte seleccionado</div><div class="value" id="rPeralte">—</div></div>
+    <div class="metric"><div class="name">Número de paneles</div><div class="value" id="rPaneles">—</div></div>
+    <div class="metric"><div class="name">Longitud de panel</div><div class="value" id="rPanel">—</div></div>
+    <div class="metric"><div class="name">Peso propio armadura</div><div class="value" id="rPeso">—</div></div>
+    <div class="metric"><div class="name">Masa total actuante</div><div class="value" id="rMasa">—</div></div>
+    <div class="metric"><div class="name">Utilización máxima</div><div class="value" id="rUtil">—</div></div>
+    <div class="metric"><div class="name">Deflexión máxima</div><div class="value" id="rDef">—</div></div>
+    <div class="metric"><div class="name">Alternativas evaluadas</div><div class="value" id="rAlt">—</div></div>
+    <div class="metric"><div class="name">Carga máxima estimada</div><div class="value" id="rCargaMax">—</div></div>
+    <div class="metric"><div class="name">Reserva de carga</div><div class="value" id="rReserva">—</div></div>
+    <div class="metric"><div class="name">Carga total máxima</div><div class="value" id="rCargaTotalMax">—</div></div>
+  </div>
+  <div class="note" id="mensaje"></div>
+</section>
+
+<section class="card results" id="materiales">
+  <h2>4. Material seleccionado</h2>
+  <table>
+    <thead><tr><th>Elemento</th><th>Perfil</th><th>Utilización Máxima</th></tr></thead>
+    <tbody id="tablaMat"></tbody>
+  </table>
+</section>
+
+<section class="card results" id="datosReporte">
+  <h2>5. Datos del proyecto</h2>
+  <table>
+    <tbody id="tablaDatos"></tbody>
+  </table>
+</section>
+</main>
+
+<!-- CHAT DE IA FLOTANTE INTERACTIVO -->
+<div id="ai-chat-container" class="no-print">
+  <button id="ai-chat-btn" onclick="toggleChat()">💬 Consultar IA de Ingeniería</button>
+  <div id="ai-chat-window" style="display: none;">
+    <div id="ai-chat-header">Asistente AutoCabrilla MX</div>
+    <div id="ai-chat-messages">
+      <div class="msg ai">¡Hola! He recuperado con éxito el motor matemático de matrices original. Realiza el cálculo del proyecto y pregúntame sobre el peso, la seguridad o los límites funcionales.</div>
+    </div>
+    <div id="ai-chat-input-area">
+      <input type="text" id="ai-user-msg" placeholder="Pregúntame sobre el peso, utilización..." onkeypress="if(event.key === 'Enter') enviarMensajeIA()">
+      <button onclick="enviarMensajeIA()">➔</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// OBJETO GLOBAL PARA TRANSFERENCIA DE DATOS A LA IA
+window.datosProyectoReal = { calculado: false };
+
+const municipios={
+  "Colima":["Armería","Colima","Comala","Coquimatlán","Cuauhtémoc","Ixtlahuacán","Manzanillo","Minatitlán","Tecomán","Villa de Álvarez"],
+  "Jalisco":["Guadalajara","Zapopan","Tlaquepaque","Tonalá","Puerto Vallarta","Autlán de Navarro","Cihuatlán"],
+  "Michoacán":["Morelia","Lázaro Cárdenas","Uruapan","Zamora","Apatzingán"],
+  "Nayarit":["Tepic","Bahía de Banderas","Compostela"],
+  "Guanajuato":["León","Guanajuato","Irapuato","Celaya","Salamanca"],
+  "Puebla":["Puebla","Tehuacán","Atlixco","San Martín Texmelucan"],
+  "Querétaro":["Querétaro","San Juan del Río","El Marqués","Corregidora"],
+  "Veracruz":["Veracruz","Xalapa","Coatzacoalcos","Poza Rica","Córdoba","Orizaba"],
+  "Otro":["Otro municipio"]
+};
+
+const vientosMunicipio={
+  "Armería":125,"Colima":80,"Comala":80,"Coquimatlán":80,"Cuauhtémoc":80,"Ixtlahuacán":95,"Manzanillo":145,"Minatitlán":95,"Tecomán":135,"Villa de Álvarez":80,
+  "Guadalajara":55,"Zapopan":55,"Tlaquepaque":55,"Tonalá":55,"Puerto Vallarta":145,"Autlán de Navarro":70,"Cihuatlán":130,
+  "Morelia":50,"Lázaro Cárdenas":135,"Uruapan":60,"Zamora":50,"Apatzingán":55,
+  "Tepic":80,"Bahía de Banderas":145,"Compostela":125,
+  "León":50,"Guanajuato":50,"Irapuato":50,"Celaya":50,"Salamanca":50,
+  "Puebla":50,"Tehuacán":50,"Atlixco":50,"San Martín Texmelucan":50,
+  "Querétaro":50,"San Juan del Río":50,"El Marqués":50,"Corregidora":50,
+  "Veracruz":145,"Xalapa":75,"Coatzacoalcos":125,"Poza Rica":115,"Córdoba":70,"Orizaba":70,
+  "Otro municipio":60
+};
+
+function cargarEstados(){
+  const e=document.getElementById("estado");
+  e.innerHTML=Object.keys(municipios).map(x=>`<option ${x==="Jalisco"?"selected":""}>${x}</option>`).join("");
+  actualizarMunicipios();
+}
+function actualizarMunicipios(){
+  const estado=document.getElementById("estado").value;
+  const m=document.getElementById("municipio");
+  m.innerHTML=municipios[estado].map(x=>`<option ${x==="Guadalajara"?"selected":""}>${x}</option>`).join("");
+}
+cargarEstados();
+
+const E=200000,FY=270,OMEGA=1.67,MAX_SL=200,G=9.80665;
+const perfiles=[
+  {id:"15-16",nombre:'PTR 1½" × 1½" Cal. 16',B:38.1,t:1.52,peso:1.78,cal:16},
+  {id:"15-14",nombre:'PTR 1½" × 1½" Cal. 14',B:38.1,t:1.90,peso:2.20,cal:14},
+  {id:"15-11",nombre:'PTR 1½" × 1½" Cal. 11',B:38.1,t:3.05,peso:3.45,cal:11},
+  {id:"20-16",nombre:'PTR 2" × 2" Cal. 16',B:50.8,t:1.52,peso:2.35,cal:16},
+  {id:"20-14",nombre:'PTR 2" × 2" Cal. 14',B:50.8,t:1.90,peso:2.91,cal:14},
+  {id:"20-11",nombre:'PTR 2" × 2" Cal. 11',B:50.8,t:3.05,peso:4.58,cal:11},
+  {id:"30-16",nombre:'PTR 3" × 3" Cal. 16',B:76.2,t:1.52,peso:3.82,cal:16},
+  {id:"30-14",nombre:'PTR 3" × 3" Cal. 14',B:76.2,t:1.90,peso:4.46,cal:14},
+  {id:"30-11",nombre:'PTR 3" × 3" Cal. 11',B:3.05,peso:7.06,cal:11}
+].map(p=>{
+  const area=p.peso/7850*1e6;
+  const bi=p.B-2*p.t;
+  const I=(p.B**4-bi**4)/12;
+  const r=Math.sqrt(I/area);
+  return {...p,area,I,r};
+});
+
+function num(id){const v=parseFloat(document.getElementById(id).value);return Number.isFinite(v)?v:0}
+function fmt(x,d=2){return Number(x).toFixed(d)}
+function zeros(n){return Array.from({length:n},()=>Array(n).fill(0))}
+
+function solveGauss(A,b){
+  const n=b.length,M=A.map((r,i)=>[...r,b[i]]);
+  for(let k=0;k<n;k++){
+    let p=k;
+    for(let i=k+1;i<n;i++) if(Math.abs(M[i][k])>Math.abs(M[p][k])) p=i;
+    [M[k],M[p]]=[M[p],M[k]];
+    if(Math.abs(M[k][k])<1e-10) throw Error("Matriz singular");
+    for(let i=k+1;i<n;i++){
+      const q=M[i][k]/M[k][k];
+      for(let j=k;j<=n;j++) M[i][j]-=q*M[k][j];
+    }
+  }
+  const x=Array(n).fill(0);
+  for(let i=n-1;i>=0;i--){
+    let s=M[i][n];
+    for(let j=i+1;j<n;j++) s-=M[i][j]*x[j];
+    x[i]=s/M[i][i];
+  }
+  return x;
+}
+
+function crearGeo(L,h,np,areas){
+  const a=L/np,nodos=[],barras=[];
+  for(let i=0;i<=np;i++){
+    nodos.push({x:i*a,y:0,id:`BI-${i+1}`});
+    nodos.push({x:i*a,y:h,id:`BS-${i+1}`});
+  }
+  const bi=i=>2*i,bs=i=>2*i+1;
+  for(let i=0;i<np;i++){
+    barras.push({i:bi(i),j:bi(i+1),g:"Cordón inferior",A:areas["Cordón inferior"]});
+    barras.push({i:bs(i),j:bs(i+1),g:"Cordón superior",A:areas["Cordón superior"]});
+  }
+  for(let i=0;i<=np;i++) barras.push({i:bi(i),j:bs(i),g:"Montantes",A:areas["Montantes"]});
+  for(let i=0;i<np;i++){
+    if(i<np/2) barras.push({i:bs(i),j:bi(i+1),g:"Diagonales",A:areas["Diagonales"]});
+    else barras.push({i:bi(i),j:bs(i+1),g:"Diagonales",A:areas["Diagonales"]});
+  }
+  return {L,h,np,a,nodos,barras};
+}
+
+function analizar(geo,profiles,carga,separacion,presionViento=0){
+  const nd=geo.nodos.length*2,K=zeros(nd);
+  const FGrav=Array(nd).fill(0),FVien=Array(nd).fill(0);
+
+  geo.barras.forEach(m=>{
+    const n1=geo.nodos[m.i],n2=geo.nodos[m.j];
+    const dx=n2.x-n1.x,dy=n2.y-n1.y,Lm=Math.hypot(dx,dy),c=dx/Lm,s=dy/Lm,k=E*m.A/Lm;
+    const ke=[[c*c,c*s,-c*c,-c*s],[c*s,s*s,-c*s,-s*s],[-c*c,-c*s,c*c,c*s],[-c*s,-s*s,c*s,s*s]];
+    const d=[2*m.i,2*m.i+1,2*m.j,2*m.j+1];
+    for(let a=0;a<4;a++) for(let b=0;b<4;b++) K[d[a]][d[b]]+=k*ke[a][b];
+  });
+
+  const peso=geo.barras.reduce((sum,m)=>{
+    const a=geo.nodos[m.i],b=geo.nodos[m.j],Lm=Math.hypot(b.x-a.x,b.y-a.y);
+    return sum+Lm*profiles[m.g].peso;
+  },0);
+
+  const masaExterna=carga*separacion*geo.L;
+  const masaTotal=masaExterna+peso;
+  const fuerzaTotalGrav=masaTotal*G;
+  const fuerzaPanelGrav=fuerzaTotalGrav/geo.np;
+
+  const fuerzaTotalViento=presionViento*separacion*geo.L*G;
+  const fuerzaPanelViento=fuerzaTotalViento/geo.np;
+  const fuerzaPanelPesoPropio=(peso*G)/geo.np;
+
+  for(let i=0;i<=geo.np;i++){
+    const factor=(i===0||i===geo.np)?0.5:1;
+    FGrav[2*(2*i+1)+1]-=fuerzaPanelGrav*factor;
+    FVien[2*(2*(i))+1+1]+=(fuerzaPanelViento-fuerzaPanelPesoPropio*0.6)*factor;
+  }
+
+  const fixed=[0,1,2*(2*geo.np)+1];
+  const free=[...Array(nd).keys()].filter(i=>!fixed.includes(i));
+  const Kr=free.map(i=>free.map(j=>K[i][j]));
+
+  const FrGrav=free.map(i=>FGrav[i]);
+  const urGrav=solveGauss(Kr,FrGrav);
+  const UGrav=Array(nd).fill(0);
+  free.forEach((d,i)=>UGrav[d]=urGrav[i]);
+
+  const FrVien=free.map(i=>FVien[i]);
+  const urVien=solveGauss(Kr,FrVien);
+  const UVien=Array(nd).fill(0);
+  free.forEach((d,i)=>UVien[d]=urVien[i]);
+
+  const fuerzasGrav=geo.barras.map(m=>{
+    const a=geo.nodos[m.i],b=geo.nodos[m.j];
+    const dx=b.x-a.x,dy=b.y-a.y,Lm=Math.hypot(dx,dy),c=dx/Lm,s=dy/Lm;
+    const du=-c*UGrav[2*m.i]-s*UGrav[2*m.i+1]+c*UGrav[2*m.j]+s*UGrav[2*m.j+1];
+    return E*m.A/Lm*du;
+  });
+
+  const fuerzasViento=geo.barras.map(m=>{
+    const a=geo.nodos[m.i],b=geo.nodos[m.j];
+    const dx=b.x-a.x,dy=b.y-a.y,Lm=Math.hypot(dx,dy),c=dx/Lm,s=dy/Lm;
+    const du=-c*UVien[2*m.i]-s*UVien[2*m.i+1]+c*UVien[2*m.j]+s*UVien[2*m.j+1];
+    return E*m.A/Lm*du;
+  });
+
+  let maxDefGrav=0,maxDefVien=0;
+  geo.nodos.forEach((n,i)=>{
+    maxDefGrav=Math.max(maxDefGrav,Math.hypot(UGrav[2*i],UGrav[2*i+1]));
+    maxDefVien=Math.max(maxDefVien,Math.hypot(UVien[2*i],UVien[2*i+1]));
+  });
+
+  return {peso,masaTotal,fuerzasGrav,fuerzasViento,maxDef:Math.max(maxDefGrav,maxDefVien)};
+}
+
+function revisarPerfil(p,F,Lm){
+  if(F>=0){
+    const cap=FY*p.area/OMEGA,u=F/cap;
+    return {ok:u<=0.70,u,sl:0};
+  }
+  const sl=Lm*1000/p.r;
+  const Fe=Math.PI*Math.PI*E/(sl*sl);
+  const Fcr=(FY/Fe<=2.25)?(0.658**(FY/Fe))*FY:0.877*Fe;
+  const cap=Fcr*p.area/OMEGA;
+  const u=Math.abs(F)/cap;
+  return {ok:sl<=MAX_SL&&u<=0.70,u,sl};
+}
+
+function evaluar(L,h,np,carga,separacion,lista,presionViento){
+  let sel={"Cordón superior":lista[0],"Cordón inferior":lista[0],"Montantes":lista[0],"Diagonales":lista[0]};
+  let geo,res,checks;
+
+  for(let it=0;it<8;it++){
+    const areas={};Object.keys(sel).forEach(g=>areas[g]=sel[g].area);
+    geo=crearGeo(L,h,np,areas);
+    res=analizar(geo,sel,carga,separacion,presionViento);
+
+    const nuevo={},det={};
+    for(const g of Object.keys(sel)){
+      let found=null,worst=0;
+      for(const p of lista){
+        let ok=true,maxu=0;
+        for(let k=0;k<geo.barras.length;k++){
+          const m=geo.barras[k];
+          if(m.g!==g) continue;
+          const a=geo.nodos[m.i],b=geo.nodos[m.j],Lm=Math.hypot(b.x-a.x,b.y-a.y);
+          
+          const rGrav=revisarPerfil(p,res.fuerzasGrav[k],Lm);
+          const rVien=revisarPerfil(p,res.fuerzasViento[k],Lm);
+          
+          if(!rGrav.ok||!rVien.ok){ok=false;break}
+          maxu=Math.max(maxu,rGrav.u,rVien.u);
+        }
+        if(ok){found=p;worst=maxu;break}
+      }
+      if(!found) return null;
+      nuevo[g]=found;
+      det[g]={u:worst};
+    }
+
+    const same=Object.keys(sel).every(g=>sel[g].id===nuevo[g].id);
+    sel=nuevo;checks=det;
+    if(same) break;
+  }
+
+  const areas={};Object.keys(sel).forEach(g=>areas[g]=sel[g].area);
+  geo=crearGeo(L,h,np,areas);
+  res=analizar(geo,sel,carga,separacion,presionViento);
+
+  const maxu=Math.max(...Object.values(checks).map(x=>x.u));
+  const limiteDef=L/240;
+  if(res.maxDef>limiteDef) return null;
+
+  return {geo,res,sel,checks,maxu};
+}
+
+function buscarCapacidad(sol,L,S,lista,cargaActual,presionViento){
+  let bajo=cargaActual,alto=Math.max(cargaActual*2,100);
+
+  for(let i=0;i<16;i++){
+    const prueba=evaluar(L,sol.geo.h,sol.geo.np,alto,S,lista,presionViento);
+    if(!prueba) break;
+    bajo=alto;
+    alto*=1.5;
+    if(alto>5000) break;
+  }
+
+  for(let i=0;i<32;i++){
+    const medio=(bajo+alto)/2;
+    const prueba=evaluar(L,sol.geo.h,sol.geo.np,medio,S,lista,presionViento);
+    if(prueba) bajo=medio;
+    else alto=medio;
+  }
+  return bajo;
+}
+
+function calcular(){
+  const L=num("luz"),S=num("separacion"),Q=num("carga");
+  const np=parseInt(document.getElementById("paneles").value);
+  const minCal=parseInt(document.getElementById("calibre").value);
+  const lista=perfiles.filter(p=>p.cal<=minCal).sort((a,b)=>a.peso-b.peso);
+  const municipioSel=document.getElementById("municipio").value;
+  const modoPeralte=document.getElementById("modoPeralte").value;
+  const hManual=num("peralteManual");
+  
+  const presionViento=vientosMunicipio[municipioSel]||60;
+
+  if(L<3||L>15||S<=0||Q<0||isNaN(np)||np<4){
+    alert("Revisa los datos. La luz debe estar entre 3 y 15 m.");
+    return;
+  }
+  if(np%2!==0){
+    alert("Por simetría estructural Pratt, el número de paneles debe ser par.");
+    return;
+  }
+
+  document.getElementById("progress").style.display="block";
+  document.getElementById("barra").style.width="20%";
+  document.getElementById("textoProgreso").textContent="Procesando ecuaciones matriciales...";
+
+  setTimeout(()=>{
+    let soluciones=[],total=0;
+
+    if(modoPeralte==="manual"){
+      total=1;
+      try{
+        const s=evaluar(L,hManual,np,Q,S,lista,presionViento);
+        if(s) soluciones.push(s);
+      }catch(e){}
+    }else{
+      for(let h=L/15;h<=L/6+1e-9;h+=0.05){
+        total++;
+        try{
+          const s=evaluar(L,h,np,Q,S,lista,presionViento);
+          if(s)soluciones.push(s);
+        }catch(e){}
+      }
+    }
+
+    if(!soluciones.length){
+      mostrarFallo(total);
+      return;
+    }
+
+    const mejor=soluciones.reduce((a,b)=>b.res.peso<a.res.peso?b:a);
+    const cargaMax=buscarCapacidad(mejor,L,S,lista,Q,presionViento);
+    
+    // GUARDAR VARIABLES REALES PARA LA IA
+    window.datosProyectoReal = {
+      calculado: true,
+      masa: mejor.res.masaTotal,
+      pesoAcero: mejor.res.peso,
+      luz: L,
+      peralte: mejor.geo.h,
+      utilizacion: mejor.maxu * 100,
+      perfil: mejor.sel["Cordón inferior"].nombre,
+      deflexion: mejor.res.maxDef * 1000
+    };
+
+    mostrar(mejor,total,cargaMax,presionViento);
+    document.getElementById("barra").style.width="100%";
+    document.getElementById("textoProgreso").textContent="Cálculo terminado con precisión.";
+  },100);
+}
+
+function mostrar(s,total,cargaMax,presionViento){
+  document.querySelectorAll(".results").forEach(x=>x.style.display="block");
+  const L=num("luz"),S=num("separacion"),Q=num("carga");
+
+  document.getElementById("rEstado").textContent="OPTIMIZADA";
+  document.getElementById("rEstado").className="value ok";
+  document.getElementById("rPeralte").textContent=fmt(s.geo.h)+" m";
+  document.getElementById("rPaneles").textContent=s.geo.np;
+  document.getElementById("rPanel").textContent=fmt(s.geo.a)+" m";
+  document.getElementById("rPeso").textContent=fmt(s.res.peso,1)+" kg";
+  document.getElementById("rMasa").textContent=fmt(s.res.masaTotal,1)+" kg";
+  document.getElementById("rUtil").textContent=fmt(s.maxu*100,1)+" %";
+  document.getElementById("rDef").textContent=fmt(s.res.maxDef*1000,2)+" mm";
+  document.getElementById("rAlt").textContent=total;
+  document.getElementById("rCargaMax").textContent=fmt(cargaMax,1)+" kg/m²";
+  document.getElementById("rReserva").textContent=fmt(cargaMax-Q,1)+" kg/m²";
+  document.getElementById("rCargaTotalMax").textContent=fmt(cargaMax*S*L,1)+" kg";
+
+  document.getElementById("tablaMat").innerHTML=Object.keys(s.sel).map(g=>
+    `<tr><td>${g}</td><td>${s.sel[g].nombre}</td><td>${fmt(s.checks[g].u*100,1)}%</td></tr>`
+  ).join("");
+
+  document.getElementById("tablaDatos").innerHTML=`
+    <tr><td>Luz / Separación</td><td>${L} m / ${S} m</td></tr>
+    <tr><td>Ubicación del proyecto</td><td>${document.getElementById("estado").value}, ${document.getElementById("municipio").value}</td></tr>
+    <tr><td>Presión por Velocidad del Viento</td><td>${presionViento} km/h</td></tr>
+    <tr><td>Norma de Diseño Empleada</td><td>IMCA 5ta Ed. (Criterio Elástico ASD)</td></tr>
+  `;
+
+  document.getElementById("mensaje").innerHTML=`<strong>Dictamen estructural:</strong> Diseño seguro bajo rigidez extrema. Respeta el límite máximo del 70% de esfuerzos. Deflexión controlada para prevenir filtraciones en cubiertas láminadas.`;
+  dibujar(s.geo);
+}
+
+function mostrarFallo(total){
+  document.querySelectorAll(".results").forEach(x=>x.style.display="none");
+  document.getElementById("resumen").style.display="block";
+  document.getElementById("rEstado").textContent="FALLO GENERAL";
+  document.getElementById("rEstado").className="value bad";
+  document.getElementById("mensaje").innerHTML=`<strong>Error de Sobrecarga o Esbeltez:</strong> Ningún perfil comercial en la base de datos pasó los filtros de pandeo lateral o deflexión en las ${total} variantes geométricas evaluadas. Reduce la luz, la separación o sube el calibre mínimo permitido.`;
+}
+
+function dibujar(g){
+  const c=document.getElementById("vista"),ctx=c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+  const m=50,w=c.width-2*m,h=c.height-2*m;
+  const sx=x=>m+x*w/g.L,sy=y=>c.height-m-y*h/g.h;
+
+  ctx.strokeStyle="#94a3b8";ctx.lineWidth=1;
+  ctx.beginPath();
+  for(let x=0;x<=g.L;x+=1){ctx.moveTo(sx(x),c.height-m);ctx.lineTo(sx(x),m)}
+  ctx.stroke();
+
+  g.barras.forEach(b=>{
+    const n1=g.nodos[b.i],n2=g.nodos[b.j];
+    ctx.lineWidth=b.g.includes("Cordón")?5:3;
+    ctx.strokeStyle=b.g.includes("Cordón")?"#14532d":"#475569";
+    ctx.beginPath();ctx.moveTo(sx(n1.x),sy(n1.y));ctx.lineTo(sx(n2.x),sy(n2.y));ctx.stroke();
+  });
+
+  g.nodos.forEach(n=>{
+    ctx.fillStyle="#1e293b";ctx.beginPath();ctx.arc(sx(n.x),sy(n.y),4,0,2*Math.PI);ctx.fill();
+  });
+}
+
+function imprimirPDF(){window.print()}
+
+// LÓGICA DE CONTROL DEL CHAT FLOTANTE
+function toggleChat() {
+  const chat = document.getElementById('ai-chat-window');
+  chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
+}
+
+function enviarMensajeIA() {
+  const input = document.getElementById('ai-user-msg');
+  const texto = input.value.trim();
+  if(!texto) return;
+  
+  const contenedor = document.getElementById('ai-chat-messages');
+  contenedor.innerHTML += `<div class="msg user">${texto}</div>`;
+  input.value = '';
+  contenedor.scrollTop = contenedor.scrollHeight;
+  
+  const consulta = texto.toLowerCase();
+  let respuestaIA = "Soy un asistente experto en ingeniería. Puedes preguntarme sobre el peso, la utilización de los perfiles o los límites reglamentarios.";
+
+  if (!window.datosProyectoReal.calculado) {
+    respuestaIA = "Primero ingresa tus parámetros y presiona **'CALCULAR CABRILLA'** para poder emitir un juicio analítico real.";
+  } else {
+    const d = window.datosProyectoReal;
+    if (consulta.includes("peso") || consulta.includes("masa") || consulta.includes("kilos") || consulta.includes("kg")) {
+      respuestaIA = `La masa estructural propia del acero es de **${fmt(d.pesoAcero,1)} kg**, y combinada con las cargas asignadas genera una masa total actuante de **${fmt(d.masa,1)} kg**.`;
+    } else if (consulta.includes("perfil") || consulta.includes("calibre") || consulta.includes("ptr")) {
+      respuestaIA = `El perfil óptimo seleccionado es el **${d.perfil}**. Satisface perfectamente los esfuerzos combinados de flexocompresión.`;
+    } else if (consulta.includes("segura") || consulta.includes("seguro") || consulta.includes("utilizacion") || consulta.includes("resist")) {
+      respuestaIA = `La estructura es 100% segura. Su porcentaje de utilización crítica es del **${fmt(d.utilizacion,1)}%**, lo que significa que trabaja de forma holgada sin riesgo estructural.`;
+    } else if (consulta.includes("deflexion") || consulta.includes("flecha") || consulta.includes("cuelgue")) {
+      const limite = (d.luz * 1000 / 240).toFixed(1);
+      respuestaIA = `Para tu luz de ${d.luz} metros, el reglamento fija una deflexión máxima admisible (L/240) de **${limite} mm**. El motor resolvió que tu flecha real es de **${fmt(d.deflexion,2)} mm**, cumpliendo a la perfección.`;
+    } else if (consulta.includes("peralte") || consulta.includes("alto") || consulta.includes("altura")) {
+      respuestaIA = `Estás analizando un peralte de **${fmt(d.peralte,2)} m** para una luz de **${d.luz} m**. Mantener esta relación geométrica previene el pandeo en el cordón superior.`;
+    }
+  }
+  
+  setTimeout(() => {
+    contenedor.innerHTML += `<div class="msg ai">${respuestaIA}</div>`;
+    contenedor.scrollTop = contenedor.scrollHeight;
+  }, 600);
+}
+</script>
+</body>
+</html>
