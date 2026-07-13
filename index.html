@@ -595,41 +595,52 @@ function toggleChat() {
   chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
 }
 
-function enviarMensajeIA() {
-  const input = document.getElementById('ai-user-msg');
-  const texto = input.value.trim();
-  if(!texto) return;
-  
-  const contenedor = document.getElementById('ai-chat-messages');
-  contenedor.innerHTML += `<div class="msg user">${texto}</div>`;
-  input.value = '';
-  contenedor.scrollTop = contenedor.scrollHeight;
-  
-  const consulta = texto.toLowerCase();
-  let respuestaIA = "Soy un asistente experto en ingeniería. Puedes preguntarme sobre el peso, la utilización de los perfiles o los límites reglamentarios.";
+// LÓGICA DE CONTROL DEL CHAT FLOTANTE
+function toggleChat() {
+    const chatWindow = document.getElementById('ai-chat-window');
+    chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
+}
 
-  if (!window.datosProyectoReal.calculado) {
-    respuestaIA = "Primero ingresa tus parámetros y presiona **'CALCULAR CABRILLA'** para poder emitir un juicio analítico real.";
-  } else {
-    const d = window.datosProyectoReal;
-    if (consulta.includes("peso") || consulta.includes("masa") || consulta.includes("kilos") || consulta.includes("kg")) {
-      respuestaIA = `La masa estructural propia del acero es de **${fmt(d.pesoAcero,1)} kg**, y combinada con las cargas asignadas genera una masa total actuante de **${fmt(d.masa,1)} kg**.`;
-    } else if (consulta.includes("perfil") || consulta.includes("calibre") || consulta.includes("ptr")) {
-      respuestaIA = `El perfil óptimo seleccionado es el **${d.perfil}**. Satisface perfectamente los esfuerzos combinados de flexocompresión.`;
-    } else if (consulta.includes("segura") || consulta.includes("seguro") || consulta.includes("utilizacion") || consulta.includes("resist")) {
-      respuestaIA = `La estructura es 100% segura. Su porcentaje de utilización crítica es del **${fmt(d.utilizacion,1)}%**, lo que significa que trabaja de forma holgada sin riesgo estructural.`;
-    } else if (consulta.includes("deflexion") || consulta.includes("flecha") || consulta.includes("cuelgue")) {
-      const limite = (d.luz * 1000 / 240).toFixed(1);
-      respuestaIA = `Para tu luz de ${d.luz} metros, el reglamento fija una deflexión máxima admisible (L/240) de **${limite} mm**. El motor resolvió que tu flecha real es de **${fmt(d.deflexion,2)} mm**, cumpliendo a la perfección.`;
-    } else if (consulta.includes("peralte") || consulta.includes("alto") || consulta.includes("altura")) {
-      respuestaIA = `Estás analizando un peralte de **${fmt(d.peralte,2)} m** para una luz de **${d.luz} m**. Mantener esta relación geométrica previene el pandeo en el cordón superior.`;
-    }
-  }
-  
-  setTimeout(() => {
-    contenedor.innerHTML += `<div class="msg ai">${respuestaIA}</div>`;
+async function enviarMensajeIA() {
+    const input = document.getElementById('ai-user-msg');
+    const texto = input.value.trim();
+    if (!texto) return;
+
+    const contenedor = document.getElementById('ai-chat-messages');
+    contenedor.innerHTML += `<div class="msg user">${texto}</div>`;
+    input.value = '';
     contenedor.scrollTop = contenedor.scrollHeight;
-  }, 600);
+
+    const API_KEY = "AQ.Ab8RN6KV1rLLeGNvfWrxxuNrpeRmuIgw0alVKk2qLwF9DTO5Vg"; 
+
+    const contextoIngenieria = `Eres AutoCabrilla MX, un asistente experto en ingeniería estructural. 
+    Datos del proyecto: Luz 6m, Separación 1m, Peralte 1m. Carga 100 kg/m². Perfil: PTR 1½"×1½" Cal 14. 
+    Utilización: 16.7%. Deflexión: 1.07 mm. Estado: 100% Seguro. Responde breve y claro en español usando HTML simple como <strong> para resaltar.`;
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: `${contextoIngenieria}\nUsuario: ${texto}` }] }]
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const respuestaIA = data.candidates[0].content.parts[0].text;
+            contenedor.innerHTML += `<div class="msg ai">${respuestaIA}</div>`;
+        } else {
+            contenedor.innerHTML += `<div class="msg ai">Recibí una respuesta vacía, por favor intenta de nuevo.</div>`;
+        }
+        contenedor.scrollTop = contenedor.scrollHeight;
+
+    } catch (error) {
+        console.error("Error:", error);
+        contenedor.innerHTML += `<div class="msg ai">Hubo un problema al conectar con el servidor de ingeniería.</div>`;
+        contenedor.scrollTop = contenedor.scrollHeight;
+    }
 }
 </script>
 </body>
