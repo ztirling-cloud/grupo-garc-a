@@ -1,9 +1,178 @@
+Pasted text.txt
+Documento
+
+Perfecto. Yo dejaría toda la sección de ayuda mucho más profesional, así:
+
+📖 ¿Cómo llenar los datos del proyecto?
+
+Complete la siguiente información para que AutoCabrilla MX pueda realizar el análisis estructural y seleccionar la cabrilla más adecuada.
+
+Dato	¿Para qué sirve?	Ejemplo
+Estado	Se utiliza para obtener las condiciones de viento correspondientes a la ubicación del proyecto.	Colima
+Municipio	Permite identificar la velocidad de viento específica del municipio seleccionado.	Tecomán
+Luz de la cabrilla	Distancia libre entre los dos apoyos de la cabrilla. No incluye volados.	6.00 m
+Separación entre cabrillas	Distancia entre una cabrilla y la siguiente. Define el área de techo que soportará cada cabrilla.	3.00 m
+Número de paneles	Divide la cabrilla en secciones iguales para realizar el análisis estructural. Debe ser un número par.	8
+Carga de diseño	Peso total que actuará sobre la cubierta, incluyendo materiales y demás cargas consideradas en el diseño.	100 kg/m²
+Modo de peralte	Permite que el programa calcule automáticamente la altura óptima o que el usuario la defina manualmente.	Automático
+Peralte manual	Altura de la cabrilla cuando se selecciona el modo manual.	0.80 m
+Calibre mínimo permitido	Define el espesor mínimo de los perfiles que el programa podrá utilizar durante la optimización.	Cal. 14
+💡 Recomendaciones
+Luz de la cabrilla: mida únicamente la distancia entre apoyos.
+Separación entre cabrillas: normalmente se utilizan valores entre 2.50 m y 4.00 m, según el tipo de cubierta y el diseño estructural.
+Peralte: se recomienda una relación aproximada entre L/10 y L/15 para obtener un comportamiento estructural eficiente.
+Número de paneles: utilice siempre un número par para mantener la simetría de la cabrilla tipo Pratt.
+Carga de diseño: considere el peso de la cubierta, elementos estructurales y las acciones que correspondan según la normativa aplicable.
+Otra mejora que le daría un aspecto muy profesional
+
+En lugar de una tabla fija, colocaría un pequeño botón ⓘ junto a cada campo. Al hacer clic o pasar el cursor, aparecería una explicación breve de ese dato.
+
+Por ejemplo:
+
+Luz de la cabrilla ⓘ → Distancia libre entre apoyos.
+Separación entre cabrillas ⓘ → Área de techo que soportará cada cabrilla.
+Carga de diseño ⓘ → Peso total considerado para el cálculo estructural.
+
+Así la interfaz queda limpia y el usuario recibe ayuda exactamente donde la necesita, con una apariencia similar a la de los programas profesionales de ingeniería.
+
+si porfavor
+
+Me gusta más esa idea. En lugar de una tabla, yo haría un panel de ayuda interactivo, similar al de los programas profesionales como SAP2000, ETABS o CYPE.
+
+Diseño propuesto
+┌──────────────────────────────────────────────────────────────┐
+│ 1. Datos del proyecto                                        │
+├──────────────────────────────────────────────────────────────┤
+
+Estado                         ⓘ
+[ Colima ▼ ]
+
+Municipio                      ⓘ
+[ Tecomán ▼ ]
+
+Luz de la cabrilla (m)         ⓘ
+[ 6.00 ]
+
+Separación entre cabrillas     ⓘ
+[ 3.00 ]
+
+Número de paneles              ⓘ
+[ 8 ]
+
+Carga de diseño (kg/m²)        ⓘ
+[ 100 ]
+
+Modo de peralte                ⓘ
+[ Automático ▼ ]
+
+Peralte manual                 ⓘ
+[ 0.80 ]
+
+Calibre mínimo                 ⓘ
+[ Cal.14 ▼ ]
+
+───────────────────────────────────────────────────────────────
+
+📖 Ayuda del campo seleccionado
+
+Distancia libre entre los dos apoyos de la cabrilla.
+No debe incluir volados.
+
+Ejemplo:
+
+●────────────────────────●
+        6.00 m
+
+Cuando el usuario haga clic en ⓘ
+Estado
+
+Seleccione el estado donde se construirá el proyecto. Esta información se utiliza para obtener las condiciones de diseño correspondientes.
+
+Municipio
+
+Permite identificar las condiciones específicas del sitio de construcción para realizar el cálculo estructural.
+
+Luz de la cabrilla
+●────────────────────────●
+
+Distancia entre apoyos
+
+
+Es la distancia libre entre los apoyos de la cabrilla. No incluye volados.
+
+Separación entre cabrillas
+Cabrilla
+──────────────
+
+3.00 m
+
+──────────────
+Cabrilla
+
+Es la distancia entre una cabrilla y la siguiente. Define el área de techo que soportará cada cabrilla.
+
+Número de paneles
+●──●──●──●──●──●──●──●
+
+Cada división es un panel.
+
+Divide la cabrilla en secciones iguales para realizar el análisis estructural. Debe ser un número par.
+
+Carga de diseño
+↓↓↓↓↓↓↓↓↓↓↓
+
+──────────────
+
+Cabrilla
+
+
+Es el peso que actuará sobre la cubierta y que deberá resistir la estructura.
+
+Peralte
+      ▲
+      │ 0.80 m
+      │
+──────┴──────
+     6.00 m
+
+Es la altura de la cabrilla. Un mayor peralte mejora la rigidez y reduce la deformación.
+
+Calibre
+
+Define el espesor mínimo de los perfiles que el programa podrá utilizar durante la optimización del diseño.
+
+Mi propuesta para AutoCabrilla MX
+
+Creo que podemos hacer que la aplicación se vea como un software comercial.
+
+Cada vez que el usuario seleccione un campo:
+
+La explicación cambiará automáticamente.
+Se mostrará un dibujo ilustrativo.
+Habrá ejemplos prácticos.
+No será necesario consultar un manual.
+
+Con este sistema, cualquier persona podrá aprender a utilizar AutoCabrilla MX mientras diseña sus cabrillas, lo que hará que la aplicación sea mucho más intuitiva y profesional.
+
+si porfavor
+
+Listo. Agregué un ícono ⓘ junto a cada dato del proyecto y un panel de ayuda interactivo.
+
+Al seleccionar cada campo, explica:
+
+Para qué sirve.
+Cómo debe llenarse.
+Un ejemplo sencillo.
+En separación entre cabrillas ya dice: “Define el área de techo que soportará cada cabrilla”, sin mencionar correas.
+
+AutoCabrilla_MX_ayuda_interactiva.html 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AutoCabrilla MX - Core Matricial con Asistente IA</title>
+<title>AutoCabrilla MX - Cálculo Matricial</title>
 <style>
   /* 1. Estilos de la Aplicación Original (Estética y Limpia) */
   :root{
@@ -47,23 +216,20 @@
   .small{font-size:12px;color:var(--muted)}
   .print-title{display:none}
   @media(max-width:820px){.grid2,.grid3,.actions{grid-template-columns:1fr}}
-  
-  /* 2. Estilos Agregados para el Chat Flotante de IA */
-  #ai-chat-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-  #ai-chat-btn { background: var(--primary); color: white; border: none; padding: 14px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-  #ai-chat-window { width: 330px; height: 420px; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; margin-top: 10px; }
-  #ai-chat-header { background: #14532d; color: white; padding: 12px; font-weight: bold; font-size: 14px; }
-  #ai-chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #f8fafc; }
-  .msg { padding: 8px 12px; border-radius: 12px; font-size: 13px; max-width: 80%; line-height: 1.45; }
-  .msg.ai { background: #e2e8f0; align-self: flex-start; color: #172033; }
-  .msg.user { background: var(--primary); align-self: flex-end; color: white; }
-  #ai-chat-input-area { display: flex; padding: 10px; border-top: 1px solid var(--border); background: white; }
-  #ai-chat-input-area input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; }
-  #ai-chat-input-area button { background: var(--primary); color: white; border: none; padding: 8px 12px; margin-left: 5px; border-radius: 8px; cursor: pointer; }
+
+  .label-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .info-btn{width:24px;height:24px;border-radius:50%;padding:0;font-size:14px;line-height:24px;background:#dcfce7;color:#166534;border:1px solid #86efac;cursor:pointer;flex:0 0 auto}
+  .info-btn:hover,.info-btn.active{background:#166534;color:#fff}
+  .help-panel{margin-top:18px;border:1px solid #bbf7d0;background:#f0fdf4;border-radius:14px;padding:16px}
+  .help-panel h3{margin:0 0 8px;font-size:17px;color:#14532d}
+  .help-panel p{margin:0;color:#334155;font-size:14px;line-height:1.55}
+  .help-example{margin-top:12px;background:#fff;border:1px dashed #86efac;border-radius:10px;padding:12px;font-family:Consolas,monospace;white-space:pre-line;color:#334155;font-size:13px}
+
+
 
   @media print{
     body{background:#fff}
-    header,.no-print,#progress,#ai-chat-container{display:none!important}
+    header,.no-print,#progress{display:none!important}
     main{max-width:none;margin:0;padding:0}
     .card{box-shadow:none;border:0;border-radius:0;page-break-inside:avoid}
     .print-title{display:block;text-align:center;margin-bottom:18px}
@@ -91,48 +257,56 @@
   <h2>1. Datos del proyecto</h2>
   <div class="grid2">
     <div>
-      <label>Estado</label>
+      <div class="label-row"><label>Estado</label><button type="button" class="info-btn" data-help="estado" aria-label="Ayuda sobre Estado">ⓘ</button></div>
       <select id="estado" onchange="actualizarMunicipios()"></select>
     </div>
     <div>
-      <label>Municipio</label>
+      <div class="label-row"><label>Municipio</label><button type="button" class="info-btn" data-help="municipio" aria-label="Ayuda sobre Municipio">ⓘ</button></div>
       <select id="municipio"></select>
     </div>
     <div>
-      <label>Luz de la cabrilla (m)</label>
+      <div class="label-row"><label>Luz de la cabrilla (m)</label><button type="button" class="info-btn" data-help="luz" aria-label="Ayuda sobre Luz">ⓘ</button></div>
       <input id="luz" type="number" min="3" max="15" step="0.01" value="6">
     </div>
     <div>
-      <label>Separación entre cabrillas (m)</label>
+      <div class="label-row"><label>Separación entre cabrillas (m)</label><button type="button" class="info-btn" data-help="separacion" aria-label="Ayuda sobre Separación">ⓘ</button></div>
       <input id="separacion" type="number" min="0.50" step="0.01" value="1">
     </div>
     <div>
-      <label>Número de paneles (Debe ser par)</label>
+      <div class="label-row"><label>Número de paneles (Debe ser par)</label><button type="button" class="info-btn" data-help="paneles" aria-label="Ayuda sobre Paneles">ⓘ</button></div>
       <input id="paneles" type="number" min="4" max="30" step="2" value="6">
     </div>
     <div>
-      <label>Carga de diseño (kg/m²)</label>
+      <div class="label-row"><label>Carga de diseño (kg/m²)</label><button type="button" class="info-btn" data-help="carga" aria-label="Ayuda sobre Carga">ⓘ</button></div>
       <input id="carga" type="number" min="0" step="0.1" value="100">
     </div>
     <div>
-      <label>Modo de Peralte (Altura)</label>
+      <div class="label-row"><label>Modo de Peralte (Altura)</label><button type="button" class="info-btn" data-help="modoPeralte" aria-label="Ayuda sobre Modo de peralte">ⓘ</button></div>
       <select id="modoPeralte" onchange="document.getElementById('peralteManual').disabled = this.value === 'auto';">
         <option value="auto">Automático (Más Económico)</option>
         <option value="manual" selected>Manual (Fijo / Personalizado)</option>
       </select>
     </div>
     <div>
-      <label>Peralte manual (m)</label>
+      <div class="label-row"><label>Peralte manual (m)</label><button type="button" class="info-btn" data-help="peralte" aria-label="Ayuda sobre Peralte">ⓘ</button></div>
       <input id="peralteManual" type="number" min="0.2" max="4" step="0.05" value="1.00">
     </div>
     <div>
-      <label>Calibre mínimo permitido</label>
+      <div class="label-row"><label>Calibre mínimo permitido</label><button type="button" class="info-btn" data-help="calibre" aria-label="Ayuda sobre Calibre">ⓘ</button></div>
       <select id="calibre">
         <option value="16">Cal. 16</option>
         <option value="14" selected>Cal. 14</option>
         <option value="11">Cal. 11</option>
       </select>
     </div>
+  </div>
+
+
+  <div class="help-panel" id="helpPanel">
+    <h3 id="helpTitle">¿Cómo llenar los datos del proyecto?</h3>
+    <p id="helpText">Seleccione el ícono ⓘ junto a cualquier campo para ver una explicación sencilla.</p>
+    <div class="help-example" id="helpExample">Ejemplo:
+Luz = distancia libre entre los apoyos de la cabrilla.</div>
   </div>
 
   <div class="actions">
@@ -148,7 +322,8 @@
 
 <section class="card">
   <h2>2. Geometría de la cabrilla</h2>
-  <canvas id="vista" width="1050" height="300"></canvas>
+  <canvas id="vista" width="1050" height="400"></canvas>
+  <span class="help">La geometría muestra los datos capturados por el cliente y se actualiza automáticamente.</span>
 </section>
 
 <section class="card results" id="resumen">
@@ -186,24 +361,70 @@
 </section>
 </main>
 
-<!-- CHAT DE IA FLOTANTE INTERACTIVO -->
-<div id="ai-chat-container" class="no-print">
-  <button id="ai-chat-btn" onclick="toggleChat()">💬 Consultar IA de Ingeniería</button>
-  <div id="ai-chat-window" style="display: none;">
-    <div id="ai-chat-header">Asistente AutoCabrilla MX</div>
-    <div id="ai-chat-messages">
-      <div class="msg ai">¡Hola! He recuperado con éxito el motor matemático de matrices original. Realiza el cálculo del proyecto y pregúntame sobre el peso, la seguridad o los límites funcionales.</div>
-    </div>
-    <div id="ai-chat-input-area">
-      <input type="text" id="ai-user-msg" placeholder="Pregúntame sobre el peso, utilización..." onkeypress="if(event.key === 'Enter') enviarMensajeIA()">
-      <button onclick="enviarMensajeIA()">➔</button>
-    </div>
-  </div>
-</div>
 
 <script>
-// OBJETO GLOBAL PARA TRANSFERENCIA DE DATOS A LA IA
-window.datosProyectoReal = { calculado: false };
+
+const ayudasProyecto={
+  estado:{
+    titulo:"Estado",
+    texto:"Seleccione el estado donde se construirá el proyecto. Este dato ayuda a identificar las condiciones generales de viento del lugar.",
+    ejemplo:"Ejemplo:\nEstado: Colima"
+  },
+  municipio:{
+    titulo:"Municipio",
+    texto:"Seleccione el municipio donde estará la estructura. El sistema utiliza esta ubicación para asignar los datos de viento disponibles.",
+    ejemplo:"Ejemplo:\nMunicipio: Tecomán"
+  },
+  luz:{
+    titulo:"Luz de la cabrilla",
+    texto:"Es la distancia libre entre el apoyo izquierdo y el apoyo derecho. No debe incluir volados.",
+    ejemplo:"Apoyo A ●────────────● Apoyo B\n             6.00 m"
+  },
+  separacion:{
+    titulo:"Separación entre cabrillas",
+    texto:"Es la distancia entre una cabrilla y la siguiente. Define el área de techo que soportará cada cabrilla.",
+    ejemplo:"Cabrilla 1 ───────────\n              3.00 m\nCabrilla 2 ───────────"
+  },
+  paneles:{
+    titulo:"Número de paneles",
+    texto:"Divide la cabrilla en secciones iguales para realizar el análisis estructural. Debe ser un número par para conservar la simetría tipo Pratt.",
+    ejemplo:"●──●──●──●──●──●──●\nCada división es un panel."
+  },
+  carga:{
+    titulo:"Carga de diseño",
+    texto:"Es el peso por metro cuadrado que actuará sobre la cubierta y que deberá resistir la cabrilla.",
+    ejemplo:"↓↓↓↓↓↓↓↓↓↓  100 kg/m²\n────────────  Cubierta\n   Cabrilla"
+  },
+  modoPeralte:{
+    titulo:"Modo de peralte",
+    texto:"En automático, el programa busca una altura conveniente. En manual, el cliente define directamente la altura de la cabrilla.",
+    ejemplo:"Automático: el programa propone.\nManual: el cliente escribe la altura."
+  },
+  peralte:{
+    titulo:"Peralte manual",
+    texto:"Es la altura total de la cabrilla. Un peralte mayor normalmente mejora la rigidez y reduce la deformación.",
+    ejemplo:"      ▲\n      │ 0.80 m\n──────┴──────"
+  },
+  calibre:{
+    titulo:"Calibre mínimo permitido",
+    texto:"Define el espesor mínimo de los perfiles PTR que el programa podrá seleccionar durante la optimización.",
+    ejemplo:"Ejemplo:\nCal. 14 = perfil más grueso que Cal. 16."
+  }
+};
+
+function mostrarAyudaProyecto(clave,boton){
+  const ayuda=ayudasProyecto[clave];
+  if(!ayuda) return;
+  document.getElementById("helpTitle").textContent=ayuda.titulo;
+  document.getElementById("helpText").textContent=ayuda.texto;
+  document.getElementById("helpExample").textContent=ayuda.ejemplo;
+  document.querySelectorAll(".info-btn").forEach(b=>b.classList.remove("active"));
+  if(boton) boton.classList.add("active");
+}
+
+document.querySelectorAll(".info-btn").forEach(boton=>{
+  boton.addEventListener("click",()=>mostrarAyudaProyecto(boton.dataset.help,boton));
+});
 
 const municipios={
   "Colima":["Armería","Colima","Comala","Coquimatlán","Cuauhtémoc","Ixtlahuacán","Manzanillo","Minatitlán","Tecomán","Villa de Álvarez"],
@@ -238,6 +459,7 @@ function actualizarMunicipios(){
   const estado=document.getElementById("estado").value;
   const m=document.getElementById("municipio");
   m.innerHTML=municipios[estado].map(x=>`<option ${x==="Guadalajara"?"selected":""}>${x}</option>`).join("");
+  if(typeof actualizarVistaCliente==="function") actualizarVistaCliente();
 }
 cargarEstados();
 
@@ -504,20 +726,7 @@ function calcular(){
 
     const mejor=soluciones.reduce((a,b)=>b.res.peso<a.res.peso?b:a);
     const cargaMax=buscarCapacidad(mejor,L,S,lista,Q,presionViento);
-    
-    // GUARDAR VARIABLES REALES PARA LA IA
-    window.datosProyectoReal = {
-      calculado: true,
-      masa: mejor.res.masaTotal,
-      pesoAcero: mejor.res.peso,
-      luz: L,
-      peralte: mejor.geo.h,
-      utilizacion: mejor.maxu * 100,
-      perfil: mejor.sel["Cordón inferior"].nombre,
-      deflexion: mejor.res.maxDef * 1000
-    };
-
-    mostrar(mejor,total,cargaMax,presionViento);
+mostrar(mejor,total,cargaMax,presionViento);
     document.getElementById("barra").style.width="100%";
     document.getElementById("textoProgreso").textContent="Cálculo terminado con precisión.";
   },100);
@@ -567,70 +776,145 @@ function mostrarFallo(total){
 function dibujar(g){
   const c=document.getElementById("vista"),ctx=c.getContext("2d");
   ctx.clearRect(0,0,c.width,c.height);
-  const m=50,w=c.width-2*m,h=c.height-2*m;
-  const sx=x=>m+x*w/g.L,sy=y=>c.height-m-y*h/g.h;
 
-  ctx.strokeStyle="#94a3b8";ctx.lineWidth=1;
+  const estado=document.getElementById("estado").value;
+  const municipio=document.getElementById("municipio").value;
+  const luz=num("luz");
+  const separacion=num("separacion");
+  const paneles=parseInt(document.getElementById("paneles").value)||0;
+  const carga=num("carga");
+  const modo=document.getElementById("modoPeralte").value;
+  const peralteManual=num("peralteManual");
+  const calibre=document.getElementById("calibre").value;
+  const peralteMostrado=modo==="manual"?peralteManual:g.h;
+
+  const izq=75,der=45,sup=125,inf=90;
+  const ancho=c.width-izq-der;
+  const alto=c.height-sup-inf;
+  const sx=x=>izq+x*ancho/g.L;
+  const sy=y=>c.height-inf-y*alto/g.h;
+
+  ctx.fillStyle="#fff";
+  ctx.fillRect(0,0,c.width,c.height);
+
+  ctx.fillStyle="#172033";
+  ctx.font="bold 18px Arial";
+  ctx.textAlign="left";
+  ctx.fillText("Geometría de la cabrilla · Datos del cliente",20,28);
+
+  ctx.font="13px Arial";
+  ctx.fillStyle="#475569";
+  ctx.fillText(`Ubicación: ${estado}, ${municipio}`,20,52);
+  ctx.fillText(`Luz: ${luz} m   |   Separación: ${separacion} m   |   Paneles: ${paneles}`,20,73);
+  ctx.fillText(`Carga de diseño: ${carga} kg/m²   |   Peralte: ${peralteMostrado.toFixed(2)} m   |   Calibre mínimo: Cal. ${calibre}`,20,94);
+
+  ctx.strokeStyle="#e2e8f0";
+  ctx.lineWidth=1;
   ctx.beginPath();
-  for(let x=0;x<=g.L;x+=1){ctx.moveTo(sx(x),c.height-m);ctx.lineTo(sx(x),m)}
+  for(let i=0;i<=g.np;i++){
+    ctx.moveTo(sx(i*g.a),sy(0)+10);
+    ctx.lineTo(sx(i*g.a),sy(g.h)-10);
+  }
   ctx.stroke();
 
   g.barras.forEach(b=>{
     const n1=g.nodos[b.i],n2=g.nodos[b.j];
     ctx.lineWidth=b.g.includes("Cordón")?5:3;
     ctx.strokeStyle=b.g.includes("Cordón")?"#14532d":"#475569";
-    ctx.beginPath();ctx.moveTo(sx(n1.x),sy(n1.y));ctx.lineTo(sx(n2.x),sy(n2.y));ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(sx(n1.x),sy(n1.y));
+    ctx.lineTo(sx(n2.x),sy(n2.y));
+    ctx.stroke();
   });
 
-  g.nodos.forEach(n=>{
-    ctx.fillStyle="#1e293b";ctx.beginPath();ctx.arc(sx(n.x),sy(n.y),4,0,2*Math.PI);ctx.fill();
+  g.nodos.forEach((n,i)=>{
+    ctx.fillStyle="#1e293b";
+    ctx.beginPath();
+    ctx.arc(sx(n.x),sy(n.y),4,0,2*Math.PI);
+    ctx.fill();
   });
+
+  // Cota horizontal de luz
+  const yCota=c.height-48;
+  ctx.strokeStyle="#166534";
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(sx(0),yCota);
+  ctx.lineTo(sx(g.L),yCota);
+  ctx.moveTo(sx(0),yCota-7);ctx.lineTo(sx(0),yCota+7);
+  ctx.moveTo(sx(g.L),yCota-7);ctx.lineTo(sx(g.L),yCota+7);
+  ctx.stroke();
+  ctx.fillStyle="#166534";
+  ctx.font="bold 13px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(`Luz total = ${luz.toFixed(2)} m`,(sx(0)+sx(g.L))/2,yCota-8);
+
+  // Cota vertical de peralte
+  const xCota=42;
+  ctx.beginPath();
+  ctx.moveTo(xCota,sy(0));
+  ctx.lineTo(xCota,sy(g.h));
+  ctx.moveTo(xCota-7,sy(0));ctx.lineTo(xCota+7,sy(0));
+  ctx.moveTo(xCota-7,sy(g.h));ctx.lineTo(xCota+7,sy(g.h));
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(25,(sy(0)+sy(g.h))/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(`Peralte = ${peralteMostrado.toFixed(2)} m`,0,0);
+  ctx.restore();
+
+  // Longitud de panel
+  if(g.np>0){
+    ctx.fillStyle="#475569";
+    ctx.font="12px Arial";
+    ctx.textAlign="center";
+    ctx.fillText(`Panel = ${(luz/paneles).toFixed(2)} m`,(sx(0)+sx(g.a))/2,sy(0)+25);
+  }
+
+  // Etiquetas de apoyos
+  ctx.fillStyle="#991b1b";
+  ctx.font="bold 12px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("Apoyo A",sx(0),sy(0)+48);
+  ctx.fillText("Apoyo B",sx(g.L),sy(0)+48);
 }
+
+
+function actualizarVistaCliente(){
+  const L=Math.max(num("luz"),3);
+  let np=parseInt(document.getElementById("paneles").value)||6;
+  if(np<4) np=4;
+  if(np%2!==0) np+=1;
+
+  const modo=document.getElementById("modoPeralte").value;
+  let h=modo==="manual"?num("peralteManual"):L/10;
+  if(h<=0) h=L/10;
+
+  const areas={
+    "Cordón superior":100,
+    "Cordón inferior":100,
+    "Montantes":100,
+    "Diagonales":100
+  };
+
+  try{
+    const geo=crearGeo(L,h,np,areas);
+    dibujar(geo);
+  }catch(e){}
+}
+
+["estado","municipio","luz","separacion","paneles","carga","modoPeralte","peralteManual","calibre"].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el){
+    el.addEventListener("input",actualizarVistaCliente);
+    el.addEventListener("change",actualizarVistaCliente);
+  }
+});
+
+setTimeout(actualizarVistaCliente,0);
 
 function imprimirPDF(){window.print()}
 
-// LÓGICA DE CONTROL DEL CHAT FLOTANTE
-function toggleChat() {
-  const chat = document.getElementById('ai-chat-window');
-  chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
-}
-
-function enviarMensajeIA() {
-  const input = document.getElementById('ai-user-msg');
-  const texto = input.value.trim();
-  if(!texto) return;
-  
-  const contenedor = document.getElementById('ai-chat-messages');
-  contenedor.innerHTML += `<div class="msg user">${texto}</div>`;
-  input.value = '';
-  contenedor.scrollTop = contenedor.scrollHeight;
-  
-  const consulta = texto.toLowerCase();
-  let respuestaIA = "Soy un asistente experto en ingeniería. Puedes preguntarme sobre el peso, la utilización de los perfiles o los límites reglamentarios.";
-
-  if (!window.datosProyectoReal.calculado) {
-    respuestaIA = "Primero ingresa tus parámetros y presiona **'CALCULAR CABRILLA'** para poder emitir un juicio analítico real.";
-  } else {
-    const d = window.datosProyectoReal;
-    if (consulta.includes("peso") || consulta.includes("masa") || consulta.includes("kilos") || consulta.includes("kg")) {
-      respuestaIA = `La masa estructural propia del acero es de **${fmt(d.pesoAcero,1)} kg**, y combinada con las cargas asignadas genera una masa total actuante de **${fmt(d.masa,1)} kg**.`;
-    } else if (consulta.includes("perfil") || consulta.includes("calibre") || consulta.includes("ptr")) {
-      respuestaIA = `El perfil óptimo seleccionado es el **${d.perfil}**. Satisface perfectamente los esfuerzos combinados de flexocompresión.`;
-    } else if (consulta.includes("segura") || consulta.includes("seguro") || consulta.includes("utilizacion") || consulta.includes("resist")) {
-      respuestaIA = `La estructura es 100% segura. Su porcentaje de utilización crítica es del **${fmt(d.utilizacion,1)}%**, lo que significa que trabaja de forma holgada sin riesgo estructural.`;
-    } else if (consulta.includes("deflexion") || consulta.includes("flecha") || consulta.includes("cuelgue")) {
-      const limite = (d.luz * 1000 / 240).toFixed(1);
-      respuestaIA = `Para tu luz de ${d.luz} metros, el reglamento fija una deflexión máxima admisible (L/240) de **${limite} mm**. El motor resolvió que tu flecha real es de **${fmt(d.deflexion,2)} mm**, cumpliendo a la perfección.`;
-    } else if (consulta.includes("peralte") || consulta.includes("alto") || consulta.includes("altura")) {
-      respuestaIA = `Estás analizando un peralte de **${fmt(d.peralte,2)} m** para una luz de **${d.luz} m**. Mantener esta relación geométrica previene el pandeo en el cordón superior.`;
-    }
-  }
-  
-  setTimeout(() => {
-    contenedor.innerHTML += `<div class="msg ai">${respuestaIA}</div>`;
-    contenedor.scrollTop = contenedor.scrollHeight;
-  }, 600);
-}
 </script>
 </body>
 </html>
